@@ -120,4 +120,153 @@ public static class ExtensionMethods
         trans.localScale = new Vector3(1, 1, 1);
     }
 }
+
+//CSharp中采用了C++ namespace的概念
+namespace SomeNameSpace{
+    //class code
+}
+
+//使用的时候 第一种方式和C++一样
+using namespace SomeNameSpace;
+
+//第二种方式比较像是JAVA
+SomeNameSpace.SomaClass.function()
+
+//List中的对象如果想要实现List的Sort函数该对象必须实现
+//Icomparable<type>接口
+
+//CSharp中的Map被Dictionary取代了
+Dictionary<Tkey,Tvalue>
+Dictionary<String,SomaClass> dic = new Dictionary<String,SomaClass>();
+dic.Add("abc",new SomeClass);
+
+//获取Dictionary中的值有两种方法 第一种可能会出现异常
+//当"abc"不存在于dic中时异常
+dic["abc"]
+//对于不能确定存在的key用下面这个
+if(dic.TryGetValue("abc",out temp)){
+    //成功的话
+}
+else{
+    //失败的话
+}
+```
+#### 2019.5.17
+```CSharp
+//Csharp特性：Coroutine
+//Coroutine在进行类似 物体移动的效果时 比起在Update函数
+//里更新物体的坐标是更加有效率的一种方法
+//Coroutine用法是 通过多次调用返回来完成整段代码
+public class CoroutinesExample : MonoBehaviour
+{
+    public float smoothing = 1f;
+    public Transform target;  
+    void Start ()
+    {
+        StartCoroutine(MyCoroutine(target));
+    }
+    //好像所有的coroutine function返回值都是IEnumberator类型  
+    IEnumerator MyCoroutine (Transform target)
+    {
+        while(Vector3.Distance(transform.position, target.position) > 0.05f)
+        {
+            transform.position = Vector3.Lerp(transform.position, target.position, smoothing * Time.deltaTime);
+            //如果前次在这里return 那么下次就在while语句开始
+            yield return null;
+        }      
+        print("Reached the target.");      
+        yield return new WaitForSeconds(3f);
+        print("MyCoroutine is now finished.");
+    }
+}
+
+//Quaternion:控制物体旋转相关的属性
+//不要直接修改XYWZ值
+//upwards:vector that defines where up is
+//返回一个相应方向的Quaternion对象
+Quaternion Quaternion.LookRotation(Vector3 forward,Vector3 upwards)
+//Spherically interpolates between a and b by t. 
+//转圈用这个很合适
+Quaternion Slerp(Quaternion a, Quaternion b, float t);
+//等价于欧拉的(0,0,0)
+Quaternion.identity
+
+//delegate是一个很神奇的东西
+//每一个delegate变量在申明时要独特底对应于一个函数类型
+//然后可以把一个或多个相应类型的函数复制给它进行调用
+//调用前确认该变量不为null可以避免异常
+//感觉类似于 角色技能这些方面 这个特性会非常有用
+
+class{
+    delegate void MyDelegate(int num);
+    void Start () 
+    {
+        //用=进行赋值
+        myDelegate = PrintNum;
+        myDelegate(50);
+        //用+进行赋值
+        myDelegate+=DoubleNum;
+        if(myDelegate!=null){
+            //使用前进行确认
+            myDelegate(50);
+        }
+    }
+    void PrintNum(int num)
+    {
+        print ("Print Num: " + num);
+    }
+    void DoubleNum(int num)
+    {
+        print ("Double Num: " + num * 2);
+    }
+}
+
+//attribute：又一个很独特的特性
+//语法是[attribute] 后面跟的是该属性附加的对象：某个值
+//或者是某个class
+//Range
+[Range(-100, 100)] public int speed = 0;
+//ExecuteInEditMode
+[ExecuteInEditMode]
+public class ColorScript : MonoBehaviour 
+{
+    void Start()
+    {
+        renderer.sharedMaterial.color = Color.red;
+    }
+}
+
+//Events：软工课上观察者模式的完美案例，一种特殊的delegate
+public class EventManager : MonoBehaviour 
+{
+    public delegate void ClickAction();
+    //event的定义基于一个delegate
+    public static event ClickAction OnClicked;
+    void OnGUI()
+    {
+        if(GUI.Button(new Rect(Screen.width / 2 - 50, 5, 100, 30), "Click"))
+        {
+            //使用前先检查是个好习惯
+            if(OnClicked != null)
+                OnClicked();
+        }
+    }
+}
+public class TeleportScript : MonoBehaviour 
+{
+    void OnEnable()
+    {
+        //订阅
+        EventManager.OnClicked += Teleport;
+    }   
+    void OnDisable()
+    {
+        //OnDisable取消订阅 重要 避免以外的bug
+        EventManager.OnClicked -= Teleport;
+    }
+    void Teleport()
+    {
+    }
+}
+
 ```
