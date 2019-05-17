@@ -42,9 +42,82 @@ public class Player
 }
 //static class的作用是 使得某个class不可以被实例化
 
-//可以在子类构造器里用base()通过特定的参数列表显示调用某一个父类构造器（默认情况下自动调用父类的构造器
+//可以在子类构造器里用base()通过特定的参数列表显示调用某一
+//个父类构造器（默认情况下自动调用父类的构造器
 
 //也可以在子类构造器里通过base调用某些父类函数
 
-//值得一提的是 关于多态方面Java和CSharp有一些显著的不同：Java中如果你持有子类的父类引用，在用父类引用调用某一个子类父类都完成的方法时调用的是子类的方法；而CSharp调用的是父类的方法，除非你显示向下转型。
+/*Member Hiding子类在继承父类的时候对子类属性的type前都加上new（或者不加也一样）
+这样子的话关于多态方面Java和CSharp就会有一些显著的不同：Java中如
+果你持有子类的父类引用，在用父类引用调用某一个子类父类都完成的方
+法时调用的是子类的方法；而CSharp调用的是父类的方法。*/
+class Fruit 
+{
+    public void SayHello()
+    {
+        Debug.Log("Hello, I am a fruit.");
+    }
+}
+class Apple : Fruit 
+{   
+    public new void SayHello()
+    {
+        Debug.Log("Hello, I am an apple.");
+    }
+}
+public class FruitSalad : MonoBehaviour
+{
+    void Start () 
+    {
+        Fruit myFruit = new Apple();
+        //这种情况下 输出的是fruit函数调用的结果    
+        myFruit.SayHello();
+    }
+}
+/*Overriding: 想要实现Java中的Overriding效果的方法是在父类方法
+的返回值前加上virtual并在复写的子类函数返回值前写上override*/
+class Fruit 
+{
+    public virtual void SayHello()
+    {
+        Debug.Log("Hello, I am a fruit.");
+    }
+}
+class Apple : Fruit 
+{   
+    public override void SayHello()
+    {
+        Debug.Log("Hello, I am an apple.");
+    }
+}
+public class FruitSalad : MonoBehaviour
+{
+    void Start () 
+    {
+        Fruit myFruit = new Apple();
+        //这种情况下 输出的是Apple函数调用的结果    
+        myFruit.SayHello();
+    }
+}
+// Interface: CSharp不支持多重继承，但支持同时实现多个接口
+
+// Extension: 这个功能感觉很屌，可以给现有的类添加方法。
+//重要的是对方法的第一个参数添加this关键字，this指向的
+//类就是我们要拓展的类
+//并且这个方法必须放在一个非泛型的static类里
+
+public static class ExtensionMethods
+{
+    //Even though they are used like normal methods, extension
+    //methods must be declared static. Notice that the first
+    //parameter has the 'this' keyword followed by a Transform
+    //variable. This variable denotes which class the extension
+    //method becomes a part of.
+    public static void ResetTransformation(this Transform trans)
+    {
+        trans.position = Vector3.zero;
+        trans.localRotation = Quaternion.identity;
+        trans.localScale = new Vector3(1, 1, 1);
+    }
+}
 ```
